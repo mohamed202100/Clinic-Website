@@ -3,8 +3,6 @@
 @section('content')
     <div class="container">
         <h1>Patients</h1>
-        @include('profile.partials.alerts')
-
 
         <a href="{{ route('patients.create') }}" class="btn btn-primary mb-3">Add Patient</a>
 
@@ -14,7 +12,6 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>DOB</th>
-                    <th>Gender</th>
                     <th>Phone</th>
                     <th>Address</th>
                     <th>Actions</th>
@@ -26,7 +23,6 @@
                         <td>{{ $patient->id }}</td>
                         <td><a href="{{ route('patients.show', $patient) }}">{{ $patient->name }}</a></td>
                         <td>{{ $patient->dob ? $patient->dob->format('Y-m-d') : '-' }}</td>
-                        <td>{{ ucfirst($patient->gender) }}</td>
                         <td>{{ $patient->phone ?? '-' }}</td>
                         <td>{{ $patient->address ?? '-' }}</td>
                         <td>

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('content')
     <div class="container">
@@ -30,9 +30,9 @@
             </div>
 
             <div class="mb-3">
-                <label for="appointment_id" class="form-label">Appointment</label>
+                <label for="appointment_id" class="form-label">Appointment (optional)</label>
                 <select name="appointment_id" id="appointment_id" class="form-control">
-                    <option value="">-- Optional --</option>
+                    <option value="">-- None --</option>
                     @foreach ($appointments as $appointment)
                         <option value="{{ $appointment->id }}"
                             {{ old('appointment_id') == $appointment->id ? 'selected' : '' }}>
@@ -59,7 +59,6 @@
                 <select name="status" id="status" class="form-control" required>
                     <option value="present" {{ old('status') == 'present' ? 'selected' : '' }}>Present</option>
                     <option value="absent" {{ old('status') == 'absent' ? 'selected' : '' }}>Absent</option>
-                    <option value="late" {{ old('status') == 'late' ? 'selected' : '' }}>Late</option>
                 </select>
             </div>
 
@@ -67,4 +66,26 @@
             <a href="{{ route('attendances.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
+@endsection --}}
+
+
+
+@extends('layouts.app')
+
+@section('content')
+    <h2>Select Patient for Attendance</h2>
+
+    <form action="{{ route('attendances.selectPatient') }}" method="POST">
+        @csrf
+        <div class="mb-3">
+            <label for="patient_id" class="form-label">Patient</label>
+            <select name="patient_id" id="patient_id" class="form-control" required>
+                <option value="">-- Select Patient --</option>
+                @foreach ($patients as $patient)
+                    <option value="{{ $patient->id }}">{{ $patient->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Next</button>
+    </form>
 @endsection

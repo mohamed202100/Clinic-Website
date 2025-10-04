@@ -18,9 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            // إضافات خاصة بالسيستم الطبي
             $table->enum('role', ['admin', 'doctor', 'staff'])->default('doctor');
-            $table->string('specialization')->nullable(); // تخصص الدكتور
+            $table->string('specialization')->nullable();
             $table->string('phone')->nullable();
 
             $table->rememberToken();

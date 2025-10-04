@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patient;
+use App\Http\Requests\PatientRequest;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
     public function index()
     {
-        $patients = Patient::orderBy('id', 'desc')->paginate(15);
+        $patients = Patient::orderBy('id')->paginate(10);
         return view('patients.index', compact('patients'));
     }
 
@@ -18,18 +19,9 @@ class PatientController extends Controller
         return view('patients.create');
     }
 
-    public function store(Request $request)
+    public function store(PatientRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-            'dob' => 'nullable|date',
-            'address' => 'nullable|string',
-        ]);
-
-        Patient::create($data);
-
+        Patient::create($request->validated());
         return redirect()->route('patients.index')->with('success', 'Patient created successfully.');
     }
 
@@ -43,18 +35,9 @@ class PatientController extends Controller
         return view('patients.edit', compact('patient'));
     }
 
-    public function update(Request $request, Patient $patient)
+    public function update(PatientRequest $request, Patient $patient)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-            'dob' => 'nullable|date',
-            'address' => 'nullable|string',
-        ]);
-
-        $patient->update($data);
-
+        $patient->update($request->validated());
         return redirect()->route('patients.index')->with('success', 'Patient updated successfully.');
     }
 

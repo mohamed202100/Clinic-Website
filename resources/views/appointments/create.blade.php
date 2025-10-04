@@ -1,44 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>Add Appointment</h2>
+    <div class="container">
+        <h2>📅 Schedule Appointment</h2>
+        <form action="{{ route('appointments.store') }}" method="POST">
+            @csrf
 
-    <form action="{{ route('appointments.store') }}" method="POST">
-        @csrf
+            @include('components.form-select', [
+                'name' => 'patient_id',
+                'label' => 'Patient',
+                'options' => $patients->pluck('name', 'id')->toArray(),
+                'value' => old('patient_id'),
+                'required' => true,
+                'emptyText' => '-- Select Patient --',
+            ])
 
-        <div class="mb-3">
-            <label class="form-label">Patient</label>
-            <select name="patient_id" class="form-control" required>
-                <option value="">-- Select Patient --</option>
-                @foreach ($patients as $p)
-                    <option value="{{ $p->id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
-                        {{ $p->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            @include('components.simple-slot-selector', [
+                'doctors' => $doctors,
+                'selectedDate' => old('appointment_date_date', ''),
+                'selectedDoctor' => old('doctor_id', ''),
+                'appointmentId' => null,
+            ])
 
-        <div class="mb-3">
-            <label class="form-label">Date & Time</label>
-            <input type="datetime-local" name="appointment_date" class="form-control" value="{{ old('appointment_date') }}"
-                required>
-        </div>
+            @include('components.form-select', [
+                'name' => 'status',
+                'label' => 'Status',
+                'options' => [
+                    'pending' => 'Pending',
+                    'confirmed' => 'Confirmed',
+                    'completed' => 'Completed',
+                    'cancelled' => 'Cancelled',
+                ],
+                'value' => old('status', 'pending'),
+                'required' => true,
+            ])
 
-        <div class="mb-3">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-control">
-                <option value="scheduled">Scheduled</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-        </div>
+            @include('components.form-textarea', [
+                'name' => 'notes',
+                'label' => 'Notes',
+                'value' => old('notes'),
+                'placeholder' => 'Enter any appointment notes or special requirements',
+                'rows' => 3,
+            ])
 
-        <div class="mb-3">
-            <label class="form-label">Notes</label>
-            <textarea name="notes" class="form-control">{{ old('notes') }}</textarea>
-        </div>
-
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{{ route('appointments.index') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-calendar-plus"></i> Schedule Appointment
+            </button>
+            <a href="{{ route('appointments.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </form>
+    </div>
 @endsection

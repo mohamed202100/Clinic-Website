@@ -4,10 +4,6 @@
     <div class="container">
         <h2>Attendances</h2>
 
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
         <div class="mb-3">
             <a href="{{ route('attendances.create') }}" class="btn btn-primary">Add Attendance</a>
         </div>

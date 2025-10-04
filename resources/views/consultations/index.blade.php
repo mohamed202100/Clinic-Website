@@ -6,10 +6,6 @@
 
         <a href="{{ route('consultations.create') }}" class="btn btn-primary mb-3">Add Consultation</a>
 
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
         <table class="table table-bordered">
             <thead>
                 <tr>

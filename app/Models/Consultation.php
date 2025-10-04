@@ -11,7 +11,7 @@ class Consultation extends Model
 
     protected $fillable = [
         'patient_id',
-        'appointment_id',
+        'attendance_id',
         'doctor_id',
         'notes',
         'diagnosis',
@@ -21,12 +21,12 @@ class Consultation extends Model
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class);
+        return $this->belongsTo(Patient::class, 'patient_id');
     }
 
-    public function appointment()
+    public function attendance()
     {
-        return $this->belongsTo(Appointment::class);
+        return $this->belongsTo(Attendance::class, 'attendance_id');
     }
 
     public function doctor()

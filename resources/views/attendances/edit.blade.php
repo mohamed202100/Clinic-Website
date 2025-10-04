@@ -19,28 +19,26 @@
             @method('PUT')
 
             <div class="mb-3">
-                <label for="patient_id" class="form-label">Patient</label>
-                <select name="patient_id" id="patient_id" class="form-control" required>
-                    @foreach ($patients as $patient)
-                        <option value="{{ $patient->id }}" {{ $attendance->patient_id == $patient->id ? 'selected' : '' }}>
-                            {{ $patient->name }}
-                        </option>
-                    @endforeach
-                </select>
+                <label class="form-label">Patient</label>
+                <input type="text" class="form-control" value="{{ $patient->name }}" disabled>
+                <input type="hidden" name="patient_id" value="{{ $patient->id }}">
             </div>
 
             <div class="mb-3">
                 <label for="appointment_id" class="form-label">Appointment</label>
-                <select name="appointment_id" id="appointment_id" class="form-control">
-                    <option value="">-- Optional --</option>
-                    @foreach ($appointments as $appointment)
-                        <option value="{{ $appointment->id }}"
-                            {{ $attendance->appointment_id == $appointment->id ? 'selected' : '' }}>
-                            {{ $appointment->appointment_date->format('Y-m-d H:i') }} - {{ $appointment->patient->name }}
+                <select name="appointment_id" id="appointment_id" class="form-control @error('appointment_id') is-invalid @enderror">
+                    <option value="">-- No Appointment --</option>
+                    @foreach ($appointments as $app)
+                        <option value="{{ $app->id }}" {{ $attendance->appointment_id == $app->id ? 'selected' : '' }}>
+                            {{ $app->appointment_date->format('M d, Y g:i A') }} - {{ ucfirst($app->status) }}
                         </option>
                     @endforeach
                 </select>
+                @error('appointment_id')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
             </div>
+
 
             <div class="mb-3">
                 <label for="checkin_at" class="form-label">Check-in Time</label>
@@ -59,7 +57,6 @@
                 <select name="status" id="status" class="form-control" required>
                     <option value="present" {{ $attendance->status == 'present' ? 'selected' : '' }}>Present</option>
                     <option value="absent" {{ $attendance->status == 'absent' ? 'selected' : '' }}>Absent</option>
-                    <option value="late" {{ $attendance->status == 'late' ? 'selected' : '' }}>Late</option>
                 </select>
             </div>
 

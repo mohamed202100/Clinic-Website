@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Patient;
 use App\Models\Appointment;
+use App\Http\Requests\AttendanceRequest;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -18,22 +19,42 @@ class AttendanceController extends Controller
     public function create()
     {
         $patients = Patient::all();
-        $appointments = Appointment::where('status', 'scheduled')->get();
-        return view('attendances.create', compact('patients', 'appointments'));
+        return view('attendances.create', compact('patients'));
     }
 
-    public function store(Request $request)
+    public function selectPatient(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'appointment_id' => 'nullable|exists:appointments,id',
-            'checkin_at' => 'nullable|date',
-            'checkout_at' => 'nullable|date',
-            'status' => 'required|in:present,absent',
         ]);
 
-        Attendance::create($data);
+        $patient = Patient::findOrFail($request->patient_id);
+        $appointments = Appointment::where('patient_id', $patient->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->get();
 
+        if ($appointments->isEmpty()) {
+            return redirect()->route('appointments.create')
+                ->with('warning', "This patient has no appointments, please book one first.");
+        }
+
+        return view('attendances.createStep2', compact('patient', 'appointments'));
+    }
+
+
+    public function store(AttendanceRequest $request)
+    {
+        $data = $request->validated();
+        
+        // Format datetime fields properly
+        if ($data['checkin_at']) {
+            $data['checkin_at'] = str_replace('T', ' ', $data['checkin_at']);
+        }
+        if ($data['checkout_at']) {
+            $data['checkout_at'] = str_replace('T', ' ', $data['checkout_at']);
+        }
+        
+        Attendance::create($data);
         return redirect()->route('attendances.index')->with('success', 'Attendance recorded successfully.');
     }
 
@@ -42,25 +63,22 @@ class AttendanceController extends Controller
         return view('attendances.show', compact('attendance'));
     }
 
-    public function edit(Attendance $attendance)
+    public function edit(\App\Models\Attendance $attendance)
     {
-        $patients = Patient::all();
-        $appointments = Appointment::all();
-        return view('attendances.edit', compact('attendance', 'patients', 'appointments'));
+        $patient = \App\Models\Patient::findOrFail($attendance->patient_id);
+
+        $appointments = \App\Models\Appointment::where('patient_id', $patient->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->orderBy('appointment_date')
+            ->get();
+
+        return view('attendances.edit', compact('attendance', 'patient', 'appointments'));
     }
 
-    public function update(Request $request, Attendance $attendance)
+    public function update(AttendanceRequest $request, Attendance $attendance)
     {
-        $data = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'appointment_id' => 'nullable|exists:appointments,id',
-            'checkin_at' => 'nullable|date',
-            'checkout_at' => 'nullable|date',
-            'status' => 'required|in:present,absent',
-        ]);
-
+        $data = $request->validated();
         $attendance->update($data);
-
         return redirect()->route('attendances.index')->with('success', 'Attendance updated successfully.');
     }
 

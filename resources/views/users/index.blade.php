@@ -3,7 +3,6 @@
 @section('content')
     <div class="container">
         <h1>Users</h1>
-        @include('profile.partials.alerts')
 
         <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">Add User</a>
 
